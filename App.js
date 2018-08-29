@@ -6,12 +6,17 @@ class App extends React.Component {
 		super(props);
 
 		this.state = {
-			open: false,
-			grantX: null,
-			movingX: null,
-			sidebarW: new Animated.Value(0),
-			sidebarMaxW: (Dimensions.get('window').width*85)/100
+			isOpen: false,
+			sidebarWidth: new Animated.Value(0),
+			sidebarMaxWidth: (Dimensions.get('window').width*85)/100 // It will open 85% of the total screen size
 		};
+
+		let configs = {
+			grantX: null, // Position X of the view when the user exec click command
+			movingX: null, // Position X of the view when the user starts to moving
+			swipeWidthStart: 10, // Width of the view which user can starts swipe
+			swipeWidthToClose: 100 // Width of the view which user needs to move to close swipe
+		}
 
 		this._panResponder = PanResponder.create({
 			// Ask to be the responder:
@@ -24,70 +29,54 @@ class App extends React.Component {
 
 			onPanResponderGrant: (evt, gestureState) => {
 				const { pageX } = evt.nativeEvent;
-				const { open } = this.state;
-
-				console.log('click', pageX, 'Open State:', open);
-
-				this.setState({
-					grantX: pageX
-				});
+				configs.grantX = pageX;
 			},
 
 			onPanResponderMove: (evt, gestureState) => {
 				const { pageX } = evt.nativeEvent;
-				const { grantX, open, sidebarMaxW } = this.state;
+				const { isOpen, sidebarMaxWidth } = this.state;
 
-				console.log('moving', open, grantX, pageX);
-
-				if(open) {
-					console.log('ABERTO')
-					if(grantX > pageX) {
-						console.log('moving...', 'GrantX:', grantX, 'Sidebar W:', sidebarMaxW, 'PageX:', pageX);
+				if(isOpen) {
+					if(configs.grantX > pageX) {
+						configs.movingX = pageX;
 						this.setState({
-							sidebarW: new Animated.Value(sidebarMaxW - (grantX - pageX)),
-							movingX: pageX
+							sidebarWidth: new Animated.Value(sidebarMaxWidth - (configs.grantX - pageX)),
 						});
 					}
 				} else {
-					console.log('FECHADO')
-					if(grantX < 10) {
+					if(configs.grantX < configs.swipeWidthStart) {
+						configs.movingX = pageX;
 						this.setState({
-							sidebarW: new Animated.Value(pageX),
-							movingX: pageX
+							sidebarWidth: new Animated.Value(pageX)
 						});
 					}
 				}
 			},
 
 			onPanResponderRelease: (evt, gestureState) => {
-				const { sidebarW, sidebarMaxW, movingX, grantX } = this.state;
+				const { sidebarWidth, sidebarMaxWidth } = this.state;
 				const { pageX } = evt.nativeEvent;
-				const result = grantX - pageX;
+				const result = configs.grantX - pageX;
 
-				console.log('leaving', grantX, 'movingOut:', movingX);
-
-				if(movingX) {
-					if(pageX < sidebarMaxW/2 || result > 100 ) {
-						console.log('LEAVING 1');
-						this.animate(sidebarW, 0).start(() => {
+				if(configs.movingX) {
+					if(result > configs.swipeWidthToClose ) {
+						this.animate(sidebarWidth, 0).start(() => {
 							this.setState({
-								sidebarW: new Animated.Value(0),
-								open: false,
-								grantX: null,
-								movingX: null
+								sidebarWidth: new Animated.Value(0),
+								isOpen: false
 							});
 						});
 					} else {
-						console.log('LEAVING 2');
-						this.animate(sidebarW, sidebarMaxW).start(() => {
+						this.animate(sidebarWidth, sidebarMaxWidth).start(() => {
 							this.setState({
-								sidebarW: new Animated.Value(sidebarMaxW),
-								open: true,
-								grantX: null,
-								movingX: null
+								sidebarWidth: new Animated.Value(sidebarMaxWidth),
+								isOpen: true
 							});
 						});
 					}
+
+					configs.grantX = null;
+					configs.movingX = null
 				}
 			},
 
@@ -107,11 +96,11 @@ class App extends React.Component {
 	}
 
 	render() {
-		const { sidebarMaxW, sidebarW } = this.state;
+		const { sidebarMaxWidth, sidebarWidth } = this.state;
 
 		return (
 			<View style={styles.container} {...this._panResponder.panHandlers}>
-				<Animated.View style={[styles.sidebar, { maxWidth: sidebarMaxW, width: sidebarW }]} />
+				<Animated.View style={[styles.sidebar, { maxWidth: sidebarMaxWidth, width: sidebarWidth }]} />
 
 				<View style={styles.content}>
 					<Text>
