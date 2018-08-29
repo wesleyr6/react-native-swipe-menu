@@ -19,13 +19,11 @@ class App extends React.Component {
 		}
 
 		this._panResponder = PanResponder.create({
-			// Ask to be the responder:
 			onStartShouldSetPanResponder: (evt, gestureState) => true,
 			onStartShouldSetPanResponderCapture: (evt, gestureState) => true,
 			onMoveShouldSetPanResponder: (evt, gestureState) => true,
 			onMoveShouldSetPanResponderCapture: (evt, gestureState) => true,
 			onPanResponderTerminationRequest: (evt, gestureState) => true,
-			onShouldBlockNativeResponder: (evt, gestureState) => true,
 
 			onPanResponderGrant: (evt, gestureState) => {
 				const { pageX } = evt.nativeEvent;
@@ -54,26 +52,28 @@ class App extends React.Component {
 			},
 
 			onPanResponderRelease: (evt, gestureState) => {
-				const { sidebarWidth, sidebarMaxWidth } = this.state;
+				const { isOpen } = this.state;
 				const { pageX } = evt.nativeEvent;
 				const result = configs.grantX - pageX;
 
 				if(configs.movingX) {
-					if(result > configs.swipeWidthToClose ) {
-						this.animate(sidebarWidth, 0).start(() => {
-							this.setState({
-								sidebarWidth: new Animated.Value(0),
-								isOpen: false
-							});
-						});
+					if(isOpen) {
+						if(result > configs.swipeWidthToClose ) {
+							this.animateToInitial();
+						} else {
+							this.animateToMax();
+						}
+
 					} else {
-						this.animate(sidebarWidth, sidebarMaxWidth).start(() => {
-							this.setState({
-								sidebarWidth: new Animated.Value(sidebarMaxWidth),
-								isOpen: true
-							});
-						});
+					
+						if( (result*-1) < configs.swipeWidthToClose ) {
+							this.animateToInitial();
+						} else {
+							this.animateToMax();
+						}
 					}
+
+					console.log('LEAVE', isOpen, configs.grantX, pageX, result)
 
 					configs.grantX = null;
 					configs.movingX = null
@@ -92,6 +92,28 @@ class App extends React.Component {
 			toValue: _toValue,
 			easing: Easing.elastic(),
 			duration: 400
+		});
+	}
+
+	animateToMax() {
+		const { sidebarWidth, sidebarMaxWidth } = this.state;
+
+		this.animate(sidebarWidth, sidebarMaxWidth).start(() => {
+			this.setState({
+				sidebarWidth: new Animated.Value(sidebarMaxWidth),
+				isOpen: true
+			});
+		});
+	}
+
+	animateToInitial() {
+		const { sidebarWidth } = this.state;
+
+		this.animate(sidebarWidth, 0).start(() => {
+			this.setState({
+				sidebarWidth: new Animated.Value(0),
+				isOpen: false
+			});
 		});
 	}
 
