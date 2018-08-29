@@ -7,7 +7,8 @@ class App extends React.Component {
 
 		this.state = {
 			open: false,
-			grantX: 0,
+			grantX: null,
+			movingX: null,
 			sidebarW: new Animated.Value(0),
 			sidebarMaxW: (Dimensions.get('window').width*85)/100
 		};
@@ -23,8 +24,9 @@ class App extends React.Component {
 
 			onPanResponderGrant: (evt, gestureState) => {
 				const { pageX } = evt.nativeEvent;
+				const { open } = this.state;
 
-				console.log('click', pageX);
+				console.log('click', pageX, 'Open State:', open);
 
 				this.setState({
 					grantX: pageX
@@ -35,46 +37,58 @@ class App extends React.Component {
 				const { pageX } = evt.nativeEvent;
 				const { grantX, open, sidebarMaxW } = this.state;
 
-				console.log('moving');
+				console.log('moving', open, grantX, pageX);
 
-				if(!open && grantX < 10) {
-					this.setState({
-						sidebarW: new Animated.Value(pageX)
-					});
-				}
-
-				if(open && grantX > pageX) {
-					console.log('moving...', 'GrantX:', grantX, 'Sidebar W:', sidebarMaxW, 'PageX:', pageX);
-					this.setState({
-						sidebarW: new Animated.Value(sidebarMaxW - (grantX - pageX))
-					});
+				if(open) {
+					console.log('ABERTO')
+					if(grantX > pageX) {
+						console.log('moving...', 'GrantX:', grantX, 'Sidebar W:', sidebarMaxW, 'PageX:', pageX);
+						this.setState({
+							sidebarW: new Animated.Value(sidebarMaxW - (grantX - pageX)),
+							movingX: pageX
+						});
+					}
+				} else {
+					console.log('FECHADO')
+					if(grantX < 10) {
+						this.setState({
+							sidebarW: new Animated.Value(pageX),
+							movingX: pageX
+						});
+					}
 				}
 			},
 
 			onPanResponderRelease: (evt, gestureState) => {
-				const { sidebarW, sidebarMaxW, open, grantX } = this.state;
+				const { sidebarW, sidebarMaxW, movingX, grantX } = this.state;
 				const { pageX } = evt.nativeEvent;
 				const result = grantX - pageX;
 
-				console.log('leaving', pageX);
+				console.log('leaving', grantX, 'movingOut:', movingX);
 
-
-				if(pageX < sidebarMaxW/2 || result > 75 ) {
-					this.animate(sidebarW, 0).start(() => {
-						this.setState({
-							sidebarW: new Animated.Value(0),
-							open: false
+				if(movingX) {
+					if(pageX < sidebarMaxW/2 || result > 100 ) {
+						console.log('LEAVING 1');
+						this.animate(sidebarW, 0).start(() => {
+							this.setState({
+								sidebarW: new Animated.Value(0),
+								open: false,
+								grantX: null,
+								movingX: null
+							});
 						});
-					});
-				} else {
-					this.animate(sidebarW, sidebarMaxW).start(() => {
-						this.setState({
-							sidebarW: new Animated.Value(sidebarMaxW),
-							open: true
+					} else {
+						console.log('LEAVING 2');
+						this.animate(sidebarW, sidebarMaxW).start(() => {
+							this.setState({
+								sidebarW: new Animated.Value(sidebarMaxW),
+								open: true,
+								grantX: null,
+								movingX: null
+							});
 						});
-					});
+					}
 				}
-
 			},
 
 			onPanResponderTerminate: (evt, gestureState) => {
@@ -124,7 +138,7 @@ const styles = StyleSheet.create({
 		left: 0,
 		top: 0,
 		zIndex: 5,
-		backgroundColor: 'yellow'
+		backgroundColor: '#1e1d29'
 	},
 	content: {
 		padding: 20
