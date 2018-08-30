@@ -8,7 +8,10 @@ class App extends React.Component {
 		this.state = {
 			isOpen: false,
 			sidebarWidth: new Animated.Value(0),
-			sidebarMaxWidth: (Dimensions.get('window').width*85)/100 // It will open 85% of the total screen size
+			sidebarMaxWidth: (Dimensions.get('window').width*85)/100, // It will open 85% of the total screen size
+			overlayWidth: 0,
+			overlayOpacity: new Animated.Value(0),
+			overlayMaxOpacity: 0.7 // Opacity Level when the overlay view is opened
 		};
 
 		let configs = {
@@ -45,14 +48,15 @@ class App extends React.Component {
 					if(configs.grantX < configs.swipeWidthStart) {
 						configs.movingX = pageX;
 						this.setState({
-							sidebarWidth: new Animated.Value(pageX)
+							sidebarWidth: new Animated.Value(pageX),
+							overlayWidth: '100%'
 						});
 					}
 				}
 			},
 
 			onPanResponderRelease: (evt, gestureState) => {
-				const { isOpen } = this.state;
+				const { isOpen, sidebarMaxWidth } = this.state;
 				const { pageX } = evt.nativeEvent;
 				const result = configs.grantX - pageX;
 
@@ -73,11 +77,15 @@ class App extends React.Component {
 						}
 					}
 
-					console.log('LEAVE', isOpen, configs.grantX, pageX, result)
-
-					configs.grantX = null;
 					configs.movingX = null
+				} else {
+					// When click on Overlay view
+					if(configs.grantX > sidebarMaxWidth && isOpen) {
+						this.animateToInitial();
+					}
 				}
+
+				configs.grantX = null;
 			},
 
 			onPanResponderTerminate: (evt, gestureState) => {
@@ -87,16 +95,20 @@ class App extends React.Component {
 		});
 	}
 
-	animate(_value, _toValue) {
-		return Animated.timing(_value, {
+	animate(_value, _toValue, _duration = 400, _isFade) {
+		let configs = {
 			toValue: _toValue,
-			easing: Easing.elastic(),
-			duration: 400
-		});
+			duration: _duration,
+		}
+
+		if(!_isFade)
+			configs.easing = Easing.elastic()
+
+		return Animated.timing(_value, configs);
 	}
 
 	animateToMax() {
-		const { sidebarWidth, sidebarMaxWidth } = this.state;
+		const { sidebarWidth, sidebarMaxWidth, overlayOpacity, overlayMaxOpacity } = this.state;
 
 		this.animate(sidebarWidth, sidebarMaxWidth).start(() => {
 			this.setState({
@@ -104,25 +116,31 @@ class App extends React.Component {
 				isOpen: true
 			});
 		});
+
+		this.animate(overlayOpacity, overlayMaxOpacity, 400, true).start();
 	}
 
 	animateToInitial() {
-		const { sidebarWidth } = this.state;
+		const { sidebarWidth, overlayOpacity } = this.state;
 
 		this.animate(sidebarWidth, 0).start(() => {
 			this.setState({
 				sidebarWidth: new Animated.Value(0),
-				isOpen: false
+				isOpen: false,
+				overlayWidth: 0
 			});
 		});
+
+		this.animate(overlayOpacity, 0, 400, true).start();
 	}
 
 	render() {
-		const { sidebarMaxWidth, sidebarWidth } = this.state;
+		const { sidebarMaxWidth, sidebarWidth, overlayWidth, overlayOpacity } = this.state;
 
 		return (
 			<View style={styles.container} {...this._panResponder.panHandlers}>
 				<Animated.View style={[styles.sidebar, { maxWidth: sidebarMaxWidth, width: sidebarWidth }]} />
+				<Animated.View style={[styles.overlay, {width: overlayWidth, opacity: overlayOpacity}]} />
 
 				<View style={styles.content}>
 					<Text>
@@ -148,8 +166,16 @@ const styles = StyleSheet.create({
 		position: 'absolute',
 		left: 0,
 		top: 0,
-		zIndex: 5,
+		zIndex: 999,
 		backgroundColor: '#1e1d29'
+	},
+	overlay: {
+		height: '100%',
+		position: 'absolute',
+		left: 0,
+		top: 0,
+		zIndex: 998,
+		backgroundColor: '#000'
 	},
 	content: {
 		padding: 20
