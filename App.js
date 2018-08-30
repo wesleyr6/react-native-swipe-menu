@@ -11,7 +11,8 @@ class App extends React.Component {
 			sidebarMaxWidth: (Dimensions.get('window').width*85)/100, // It will open 85% of the total screen size
 			overlayWidth: 0,
 			overlayOpacity: new Animated.Value(0),
-			overlayMaxOpacity: 0.7 // Opacity Level when the overlay view is opened
+			overlayMaxOpacity: 0.7, // Opacity Level when the overlay view is opened
+			animationDuration: 400 // miliseconds
 		};
 
 		let configs = {
@@ -35,7 +36,7 @@ class App extends React.Component {
 
 			onPanResponderMove: (evt, gestureState) => {
 				const { pageX } = evt.nativeEvent;
-				const { isOpen, sidebarMaxWidth } = this.state;
+				const { isOpen, sidebarMaxWidth, sidebarWidth, overlayMaxOpacity } = this.state;
 
 				if(isOpen) {
 					if(configs.grantX > pageX) {
@@ -53,6 +54,11 @@ class App extends React.Component {
 						});
 					}
 				}
+				
+				const _size = sidebarWidth._value > sidebarMaxWidth ? sidebarMaxWidth : sidebarWidth._value;
+				this.setState({
+					overlayOpacity: (overlayMaxOpacity*_size)/sidebarMaxWidth
+				})
 			},
 
 			onPanResponderRelease: (evt, gestureState) => {
@@ -95,10 +101,10 @@ class App extends React.Component {
 		});
 	}
 
-	animate(_value, _toValue, _duration = 400, _isFade) {
+	animate(_value, _toValue, _duration = this.state.animationDuration, _isFade) {
 		let configs = {
 			toValue: _toValue,
-			duration: _duration,
+			duration: _duration
 		}
 
 		if(!_isFade)
@@ -108,7 +114,7 @@ class App extends React.Component {
 	}
 
 	animateToMax() {
-		const { sidebarWidth, sidebarMaxWidth, overlayOpacity, overlayMaxOpacity } = this.state;
+		const { sidebarWidth, sidebarMaxWidth } = this.state;
 
 		this.animate(sidebarWidth, sidebarMaxWidth).start(() => {
 			this.setState({
@@ -116,12 +122,10 @@ class App extends React.Component {
 				isOpen: true
 			});
 		});
-
-		this.animate(overlayOpacity, overlayMaxOpacity, 400, true).start();
 	}
 
 	animateToInitial() {
-		const { sidebarWidth, overlayOpacity } = this.state;
+		const { sidebarWidth, sidebarMaxWidth, overlayMaxOpacity, animationDuration } = this.state;
 
 		this.animate(sidebarWidth, 0).start(() => {
 			this.setState({
@@ -130,8 +134,10 @@ class App extends React.Component {
 				overlayWidth: 0
 			});
 		});
-
-		this.animate(overlayOpacity, 0, 400, true).start();
+	
+		this.setState({
+			overlayOpacity: (overlayMaxOpacity*(animationDuration/100)/sidebarMaxWidth)
+		})
 	}
 
 	render() {
@@ -157,7 +163,7 @@ const styles = StyleSheet.create({
 		width: '100%',
 		height: '100%',
 		position: 'relative',
-		backgroundColor: '#f1f1f1',
+		backgroundColor: '#fff',
 		marginTop: 23,
 		flexDirection: 'row'
 	},
