@@ -1,5 +1,17 @@
 {
   "expo": {
-    "sdkVersion": "27.0.0"
+    "name": "testing menu animation",
+    "version": "1.0.0",
+    "sdkVersion": "27.0.0",
+    "slug": "test-menu-animation",
+    "privacy": "unlisted",
+    "githubUrl": "https://github.com/wesleyamaro/react-native-animation",
+    "orientation": "portrait",
+    "ios": {
+      "bundleIdentifier": "com.wesleyamaro.testingmenu"
+    },
+    "android": {
+      "package": "com.wesleyamaro.testingmenu"
+    }
   }
 }
