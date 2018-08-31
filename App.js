@@ -18,8 +18,8 @@ class App extends React.Component {
 		let configs = {
 			grantX: null, // Position X of the view when the user exec click command
 			movingX: null, // Position X of the view when the user starts to moving
-			swipeWidthStart: 10, // Width of the view which user can starts swipe
-			swipeWidthToClose: 100 // Width of the view which user needs to move to close swipe
+			swipeWidthStart: 30, // Width of the view which user can starts swipe
+			swipeWidthToClose: 75 // Width of the view which user needs to move to close swipe
 		}
 
 		this._panResponder = PanResponder.create({
