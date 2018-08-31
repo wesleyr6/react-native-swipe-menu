@@ -28,7 +28,6 @@ class Sidebar extends React.Component {
 			onStartShouldSetPanResponderCapture: (evt, gestureState) => true,
 			onMoveShouldSetPanResponder: (evt, gestureState) => true,
 			onMoveShouldSetPanResponderCapture: (evt, gestureState) => true,
-			onPanResponderTerminationRequest: (evt, gestureState) => true,
 
 			onPanResponderGrant: (evt, gestureState) => {
 				const { pageX } = evt.nativeEvent;
@@ -95,11 +94,6 @@ class Sidebar extends React.Component {
 				}
 
 				configs.grantX = null;
-			},
-
-			onPanResponderTerminate: (evt, gestureState) => {
-				// Another component has become the responder, so this gesture
-				// should be cancelled
 			}
 		});
 	}
