@@ -1,5 +1,7 @@
 import React from 'react';
 import { View, PanResponder, Dimensions, Text, StyleSheet, Animated, Easing } from 'react-native';
+import Content from './src/components/Content';
+import Sidebar from './src/components/Sidebar';
 
 class App extends React.Component {
 	constructor(props) {
@@ -155,14 +157,13 @@ class App extends React.Component {
 
 		return (
 			<View style={styles.container} {...this._panResponder.panHandlers}>
-				<Animated.View style={[styles.sidebar, { maxWidth: sidebarMaxWidth, width: sidebarWidth }]} />
-				<Animated.View style={[styles.overlay, {width: overlayWidth, opacity: overlayOpacity}]} />
-
-				<View style={styles.content}>
-					<Text>
-						Lorem ipsum dolor sit amet, consectetur adipiscing elit. Nunc sed hendrerit ex. Fusce hendrerit ac risus semper imperdiet. Nulla vitae semper purus, a vehicula neque. Suspendisse dictum dui non tortor tristique, nec rutrum justo aliquam. Cras porttitor metus odio, at volutpat felis iaculis vel. Praesent sit amet tellus faucibus, feugiat nibh a, varius lectus. Nulla facilisi. Pellentesque habitant morbi tristique senectus et netus et malesuada fames ac turpis egestas. Etiam tellus dolor, aliquet vitae mollis sit amet, varius rutrum nulla. In lacinia elementum euismod. Donec at varius risus. Vivamus sed euismod odio, ut varius arcu. Duis vulputate mattis odio, ac convallis dui gravida tempor. Sed ornare feugiat risus, vitae scelerisque turpis accumsan a. Suspendisse a ornare felis, sed dapibus metus. Nam in mattis velit, ut posuere elit.
-					</Text>
-				</View>
+				<Sidebar 
+					contentComponent={<Content />}
+					sidebarMaxWidth={sidebarMaxWidth}
+					sidebarWidth={sidebarWidth}
+					overlayWidth={overlayWidth}
+					overlayOpacity={overlayOpacity}
+				/>
 			</View>
 		);
 	}
@@ -176,25 +177,6 @@ const styles = StyleSheet.create({
 		backgroundColor: '#fff',
 		marginTop: 23,
 		flexDirection: 'row'
-	},
-	sidebar: {
-		height: '100%',
-		position: 'absolute',
-		left: 0,
-		top: 0,
-		zIndex: 999,
-		backgroundColor: '#1e1d29'
-	},
-	overlay: {
-		height: '100%',
-		position: 'absolute',
-		left: 0,
-		top: 0,
-		zIndex: 998,
-		backgroundColor: '#000'
-	},
-	content: {
-		padding: 20
 	}
 });
 
