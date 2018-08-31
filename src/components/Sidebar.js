@@ -176,7 +176,6 @@ const styles = StyleSheet.create({
 		height: '100%',
 		position: 'relative',
 		backgroundColor: '#fff',
-		marginTop: 23,
 		flexDirection: 'row'
 	},
 	sidebar: {
