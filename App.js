@@ -48,16 +48,18 @@ class App extends React.Component {
 				} else {
 					if(configs.grantX < configs.swipeWidthStart) {
 						configs.movingX = pageX;
+
+						const _size = pageX > sidebarMaxWidth ? sidebarMaxWidth : pageX;
+
 						this.setState({
-							sidebarWidth: new Animated.Value(pageX),
+							sidebarWidth: new Animated.Value(_size),
 							overlayWidth: '100%'
 						});
 					}
 				}
-				
-				const _size = sidebarWidth._value > sidebarMaxWidth ? sidebarMaxWidth : sidebarWidth._value;
+
 				this.setState({
-					overlayOpacity: (overlayMaxOpacity*_size)/sidebarMaxWidth
+					overlayOpacity: new Animated.Value( (overlayMaxOpacity*sidebarWidth._value)/sidebarMaxWidth )
 				})
 			},
 
@@ -114,7 +116,7 @@ class App extends React.Component {
 	}
 
 	animateToMax() {
-		const { sidebarWidth, sidebarMaxWidth } = this.state;
+		const { sidebarWidth, sidebarMaxWidth, overlayOpacity, overlayMaxOpacity, animationDuration } = this.state;
 
 		this.animate(sidebarWidth, sidebarMaxWidth).start(() => {
 			this.setState({
@@ -122,10 +124,16 @@ class App extends React.Component {
 				isOpen: true
 			});
 		});
+		
+		this.animate(overlayOpacity, overlayMaxOpacity, animationDuration, true).start(() => {
+			this.setState({
+				overlayOpacity: new Animated.Value(overlayMaxOpacity)
+			})
+		});
 	}
 
 	animateToInitial() {
-		const { sidebarWidth, sidebarMaxWidth, overlayMaxOpacity, animationDuration } = this.state;
+		const { sidebarWidth, overlayOpacity, animationDuration } = this.state;
 
 		this.animate(sidebarWidth, 0).start(() => {
 			this.setState({
@@ -134,10 +142,12 @@ class App extends React.Component {
 				overlayWidth: 0
 			});
 		});
-	
-		this.setState({
-			overlayOpacity: (overlayMaxOpacity*(animationDuration/100)/sidebarMaxWidth)
-		})
+
+		this.animate(overlayOpacity, 0, animationDuration, true).start(() => {
+			this.setState({
+				overlayOpacity: new Animated.Value(0)
+			})
+		});
 	}
 
 	render() {
