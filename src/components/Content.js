@@ -4,22 +4,13 @@ import { View, Text, TouchableOpacity, StyleSheet } from 'react-native';
 class Content extends React.Component {
     constructor(props) {
         super(props)
-        this.state = { count: 0 }
-    }
-
-    onPress = () => {
-        this.setState({
-            count: this.state.count+1
-        })
     }
 
     render() {
         return(
             <View>
                 <View style={styles.header}>
-                    <TouchableOpacity onPress={this.onPress}>
-                        <Text>Button working {this.state.count}</Text>
-                    </TouchableOpacity>
+                    <Text style={styles.headerText}>Header</Text>
                 </View>
 
                 <View style={styles.content}>
@@ -27,7 +18,7 @@ class Content extends React.Component {
                         Lorem ipsum dolor sit amet, consectetur adipiscing elit. Nunc sed hendrerit ex. Fusce hendrerit ac risus semper imperdiet. Nulla vitae semper purus, a vehicula neque. Suspendisse dictum dui non tortor tristique, nec rutrum justo aliquam. Cras porttitor metus odio, at volutpat felis iaculis vel. Praesent sit amet tellus faucibus, feugiat nibh a, varius lectus. 
                     </Text>
 
-                    <Text>
+                    <Text style={styles.paragraph}>
                         Nulla facilisi. Pellentesque habitant morbi tristique senectus et netus et malesuada fames ac turpis egestas. Etiam tellus dolor, aliquet vitae mollis sit amet, varius rutrum nulla. In lacinia elementum euismod. Donec at varius risus. Vivamus sed euismod odio, ut varius arcu. Duis vulputate mattis odio, ac convallis dui gravida tempor. Sed ornare feugiat risus, vitae scelerisque turpis accumsan a. Suspendisse a ornare felis, sed dapibus metus. Nam in mattis velit, ut posuere elit.
                     </Text>
                 </View>
@@ -42,9 +33,14 @@ const styles = StyleSheet.create({
     },
     header: {
         padding: 10,
-        backgroundColor: '#fff',
+        backgroundColor: 'yellow',
         borderBottomWidth: 1,
-        borderBottomColor: '#000'
+        borderBottomColor: '#000',
+        alignItems: 'center'
+    },
+    headerText: {
+        fontSize: 18,
+        fontWeight: '600'
     },
     content: {
         padding: 10,
@@ -53,8 +49,9 @@ const styles = StyleSheet.create({
         borderRadius: 5
     },
     paragraph: {
-        marginBottom: 10,
-        fontSize: 14
+        marginBottom: 15,
+        fontSize: 16,
+        lineHeight: 22
     },
     button: {
         backgroundColor: '#DDD',
