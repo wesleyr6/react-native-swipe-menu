@@ -1,20 +1,66 @@
 import React from 'react';
-import { View, Text, Animated, StyleSheet } from 'react-native';
+import { View, Text, TouchableOpacity, StyleSheet } from 'react-native';
 
-const Content = () => {
-    return(
-        <View style={styles.content}>
-            <Text>
-                Lorem ipsum dolor sit amet, consectetur adipiscing elit. Nunc sed hendrerit ex. Fusce hendrerit ac risus semper imperdiet. Nulla vitae semper purus, a vehicula neque. Suspendisse dictum dui non tortor tristique, nec rutrum justo aliquam. Cras porttitor metus odio, at volutpat felis iaculis vel. Praesent sit amet tellus faucibus, feugiat nibh a, varius lectus. Nulla facilisi. Pellentesque habitant morbi tristique senectus et netus et malesuada fames ac turpis egestas. Etiam tellus dolor, aliquet vitae mollis sit amet, varius rutrum nulla. In lacinia elementum euismod. Donec at varius risus. Vivamus sed euismod odio, ut varius arcu. Duis vulputate mattis odio, ac convallis dui gravida tempor. Sed ornare feugiat risus, vitae scelerisque turpis accumsan a. Suspendisse a ornare felis, sed dapibus metus. Nam in mattis velit, ut posuere elit.
-            </Text>
-        </View>
-    )
+class Content extends React.Component {
+    constructor(props) {
+        super(props)
+        this.state = { count: 0 }
+    }
+
+    onPress = () => {
+        this.setState({
+            count: this.state.count+1
+        })
+    }
+
+    render() {
+        return(
+            <View>
+                <View style={styles.header}>
+                    <TouchableOpacity onPress={this.onPress}>
+                        <Text>Open Menu {this.state.count}</Text>
+                    </TouchableOpacity>
+                </View>
+
+                <View style={styles.content}>
+                    <Text style={styles.paragraph}>
+                        Lorem ipsum dolor sit amet, consectetur adipiscing elit. Nunc sed hendrerit ex. Fusce hendrerit ac risus semper imperdiet. Nulla vitae semper purus, a vehicula neque. Suspendisse dictum dui non tortor tristique, nec rutrum justo aliquam. Cras porttitor metus odio, at volutpat felis iaculis vel. Praesent sit amet tellus faucibus, feugiat nibh a, varius lectus. 
+                    </Text>
+
+                    <Text>
+                        Nulla facilisi. Pellentesque habitant morbi tristique senectus et netus et malesuada fames ac turpis egestas. Etiam tellus dolor, aliquet vitae mollis sit amet, varius rutrum nulla. In lacinia elementum euismod. Donec at varius risus. Vivamus sed euismod odio, ut varius arcu. Duis vulputate mattis odio, ac convallis dui gravida tempor. Sed ornare feugiat risus, vitae scelerisque turpis accumsan a. Suspendisse a ornare felis, sed dapibus metus. Nam in mattis velit, ut posuere elit.
+                    </Text>
+                </View>
+            </View>
+        )
+    }
 }
 
 const styles = StyleSheet.create({
-	content: {
-		padding: 20
-	}
+    container: {
+        backgroundColor: '#E9EAED'
+    },
+    header: {
+        padding: 10,
+        backgroundColor: '#fff',
+        borderBottomWidth: 1,
+        borderBottomColor: '#000'
+    },
+    content: {
+        padding: 10,
+        margin: 10,
+        backgroundColor: '#F6F7F8',
+        borderRadius: 5
+    },
+    paragraph: {
+        marginBottom: 10,
+        fontSize: 14
+    },
+    button: {
+        backgroundColor: '#DDD',
+        padding: 10,
+        alignItems: 'center'
+    }
 });
 
 export default Content;
