@@ -8,7 +8,10 @@ const App = () => {
 	return (
 		<View>
 			<StatusBar bg={'#313131'} />
-			<Sidebar contentComponent={<Content />} />
+			
+			<Sidebar>
+				<Content />
+			</Sidebar>
 		</View>
 	);
 }
