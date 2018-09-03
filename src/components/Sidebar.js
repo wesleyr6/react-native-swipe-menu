@@ -25,9 +25,8 @@ class Sidebar extends React.Component {
 
 		this._panResponder = PanResponder.create({
 			onStartShouldSetPanResponder: (evt, gestureState) => true,
-			onStartShouldSetPanResponderCapture: (evt, gestureState) => true,
 			onMoveShouldSetPanResponder: (evt, gestureState) => true,
-			onMoveShouldSetPanResponderCapture: (evt, gestureState) => true,
+			onPanResponderTerminationRequest: (evt, gestureState) => true,
 
 			onPanResponderGrant: (evt, gestureState) => {
 				const { pageX } = evt.nativeEvent;
@@ -146,22 +145,18 @@ class Sidebar extends React.Component {
 	}
 
 	render() {
-		const { sidebarMaxWidth, sidebarWidth, overlayWidth, overlayOpacity } = this.state;
-		const { contentComponent } = this.props;
+		const { sidebarMaxWidth, sidebarWidth, overlayWidth, overlayOpacity, isOpen } = this.state;
+		const { children } = this.props;
 
 		return(
 			<View style={styles.container} {...this._panResponder.panHandlers}>
 				<Animated.View style={[styles.sidebar, { maxWidth: sidebarMaxWidth, width: sidebarWidth }]} />
 				<Animated.View style={[styles.overlay, {width: overlayWidth, opacity: overlayOpacity}]} />
 
-				{contentComponent}
+				<View isOpen={isOpen}>{children}</View>
 			</View>
 		)
 	}
-}
-
-Sidebar.propTypes = {
-	contentComponent: PropTypes.object.isRequired
 }
 
 const styles = StyleSheet.create({
