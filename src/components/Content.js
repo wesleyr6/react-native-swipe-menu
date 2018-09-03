@@ -18,7 +18,7 @@ class Content extends React.Component {
             <View>
                 <View style={styles.header}>
                     <TouchableOpacity onPress={this.onPress}>
-                        <Text>Open Menu {this.state.count}</Text>
+                        <Text>Button working {this.state.count}</Text>
                     </TouchableOpacity>
                 </View>
 
