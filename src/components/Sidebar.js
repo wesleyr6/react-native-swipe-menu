@@ -11,7 +11,7 @@ class Sidebar extends React.Component {
 		this.state = {
 			isOpen: false,
 			sidebarWidth: sidebarPositionCalc*-1, // It will open 85% of the total screen size
-			sidebarPosition: sidebarPositionCalc,
+			sidebarPosition: new Animated.Value(sidebarPositionCalc),
 			overlayWidth: 0,
 			overlayOpacity: new Animated.Value(0),
 			overlayMaxOpacity: 0.7, // Opacity Level when the overlay view is opened
@@ -24,6 +24,9 @@ class Sidebar extends React.Component {
 			swipeWidthStart: 30, // Width of the view which user can starts swipe
 			swipeWidthToClose: 75 // Width of the view which user needs to move to close swipe
 		}
+
+		this.animateToMax = this.animateToMax.bind(this);
+		this.animateToInitial = this.animateToInitial.bind(this);
 
 		this._panResponder = PanResponder.create({
 			onStartShouldSetPanResponder: (evt, gestureState) => true,
@@ -153,7 +156,7 @@ class Sidebar extends React.Component {
 		const { children } = this.props;
 
 		const childrenWithProps = React.Children.map(children, child => 
-			React.cloneElement(child, { sidebarIsOpen: isOpen }))
+			React.cloneElement(child, { sidebarIsOpen: isOpen, openSidebar: this.animateToMax }))
 
 		return(
 			<View style={styles.container} {...this._panResponder.panHandlers}>
