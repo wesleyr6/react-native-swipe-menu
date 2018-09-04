@@ -1,16 +1,16 @@
 import React from 'react';
-import { View, Text, TouchableOpacity, StyleSheet } from 'react-native';
+import PropTypes from 'prop-types';
+import { View, Text, Button, StyleSheet } from 'react-native';
 
 class Content extends React.Component {
-    constructor(props) {
-        super(props)
-    }
-
     render() {
+        const { sidebarIsOpen, openSidebar } = this.props;
+
         return(
             <View>
                 <View style={styles.header}>
-                    <Text style={styles.headerText}>Header</Text>
+                    <Text style={styles.headerText}>{`Sidebar is opened? ${sidebarIsOpen}`}</Text>
+                    <Button title='Open menu' onPress={openSidebar} />
                 </View>
 
                 <View style={styles.content}>
@@ -27,12 +27,17 @@ class Content extends React.Component {
     }
 }
 
+Content.propTypes = {
+    sidebarIsOpen: PropTypes.bool,
+    openSidebar: PropTypes.func
+}
+
 const styles = StyleSheet.create({
     container: {
         backgroundColor: '#E9EAED'
     },
     header: {
-        padding: 10,
+        padding: 12,
         backgroundColor: 'yellow',
         borderBottomWidth: 1,
         borderBottomColor: '#000',
@@ -40,7 +45,8 @@ const styles = StyleSheet.create({
     },
     headerText: {
         fontSize: 18,
-        fontWeight: '600'
+        fontWeight: '600',
+        marginBottom: 10
     },
     content: {
         padding: 10,
