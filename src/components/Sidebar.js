@@ -2,7 +2,8 @@ import React from 'react';
 import PropTypes from 'prop-types';
 import { View, PanResponder, Dimensions, StyleSheet, Animated, Easing, Button } from 'react-native';
 
-const sidebarPositionCalc = (((Dimensions.get('window').width*85)/100)*-1);
+// It will open 83% of the total screen size
+const sidebarPositionCalc = (((Dimensions.get('window').width*84)/100)*-1);
 
 class Sidebar extends React.Component {
 	constructor(props) {
@@ -10,7 +11,7 @@ class Sidebar extends React.Component {
 
 		this.state = {
 			isOpen: false,
-			sidebarWidth: sidebarPositionCalc*-1, // It will open 85% of the total screen size
+			sidebarWidth: sidebarPositionCalc*-1, 
 			sidebarPosition: new Animated.Value(sidebarPositionCalc),
 			overlayWidth: 0,
 			overlayOpacity: new Animated.Value(0),
@@ -21,8 +22,8 @@ class Sidebar extends React.Component {
 		let configs = {
 			grantX: null, // Position X of the view when the user exec click command
 			movingX: null, // Position X of the view when the user starts to moving
-			swipeWidthStart: 30, // Width of the view which user can starts swipe
-			swipeWidthToClose: 75 // Width of the view which user needs to move to close swipe
+			swipeWidthStart: 40, // Width of the view which user can starts swipe
+			swipeWidthToClose: 70 // Width of the view which user needs to move to close swipe
 		}
 
 		this.animateToMax = this.animateToMax.bind(this);
@@ -117,7 +118,12 @@ class Sidebar extends React.Component {
 	}
 
 	animateToMax() {
-		const { sidebarPosition, overlayOpacity, overlayMaxOpacity, animationDuration } = this.state;
+		const { sidebarPosition, overlayOpacity, overlayMaxOpacity, animationDuration, overlayWidth } = this.state;
+
+		if(overlayWidth !== '100%')
+			this.setState({
+				overlayWidth: '100%'
+			})
 
 		this.animate(sidebarPosition, 0).start(() => {
 			this.setState({
@@ -151,25 +157,32 @@ class Sidebar extends React.Component {
 		});
 	}
 
+	childrenWithProps(item, ...rest) {
+		return React.Children.map(item, child => 
+			React.cloneElement(child, ...rest))
+	}
+
 	render() {
 		const { sidebarWidth, overlayWidth, overlayOpacity, sidebarPosition, isOpen } = this.state;
-		const { children } = this.props;
-
-		const childrenWithProps = React.Children.map(children, child => 
-			React.cloneElement(child, { sidebarIsOpen: isOpen, openSidebar: this.animateToMax }))
+		const { children, menu } = this.props;
 
 		return(
 			<View style={styles.container} {...this._panResponder.panHandlers}>
 				<Animated.View style={[styles.sidebar, { width: sidebarWidth, left: sidebarPosition }]}>
-					<Button title="click to close it" onPress={() => this.animateToInitial()} />
+					{this.childrenWithProps(menu, { sidebarIsOpen: isOpen, closeSidebar: this.animateToInitial })}
 				</Animated.View>
 
 				<Animated.View style={[styles.overlay, {width: overlayWidth, opacity: overlayOpacity}]} />
 
-				<View>{childrenWithProps}</View>
+				{this.childrenWithProps(children, { sidebarIsOpen: isOpen, openSidebar: this.animateToMax })}
 			</View>
 		)
 	}
+}
+
+Sidebar.propType = {
+	children: PropTypes.object.isRequired, 
+	menu: PropTypes.object.isRequired
 }
 
 const styles = StyleSheet.create({
