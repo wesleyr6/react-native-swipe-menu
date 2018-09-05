@@ -97,8 +97,6 @@ class Sidebar extends React.Component {
 		const { pageX } = evt.nativeEvent;
 		const result = pageX - configs.grantX;
 
-		console.log('RELEASE', result)
-
 		if(configs.movingX) {
 			if(isOpen) {
 				if((result*-1) > configs.swipeWidthToClose ) {
@@ -142,7 +140,7 @@ class Sidebar extends React.Component {
 	animateToMax() {
 		const { sidebarPosition, overlayOpacity, overlayMaxOpacity, animationDuration, overlayWidth } = this.state;
 
-		if(overlayWidth !== '100%') {
+		if(overlayWidth !== '100%')
 			this.setState({
 				overlayWidth: '100%'
 			})
