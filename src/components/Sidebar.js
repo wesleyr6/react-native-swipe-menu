@@ -5,6 +5,13 @@ import { View, PanResponder, Dimensions, StyleSheet, Animated, Easing, Button } 
 // It will open 83% of the total screen size
 const sidebarPositionCalc = (((Dimensions.get('window').width*84)/100)*-1);
 
+let configs = {
+	grantX: null, // Position X of the view when the user exec click command
+	movingX: null, // Position X of the view when the user starts to moving
+	swipeWidthStart: 40, // Width of the view which user can starts swipe
+	swipeWidthToClose: 70 // Width of the view which user needs to move to close swipe
+}
+
 class Sidebar extends React.Component {
 	constructor(props) {
 		super(props);
@@ -19,90 +26,105 @@ class Sidebar extends React.Component {
 			animationDuration: 400 // miliseconds
 		};
 
-		let configs = {
-			grantX: null, // Position X of the view when the user exec click command
-			movingX: null, // Position X of the view when the user starts to moving
-			swipeWidthStart: 40, // Width of the view which user can starts swipe
-			swipeWidthToClose: 70 // Width of the view which user needs to move to close swipe
-		}
-
 		this.animateToMax = this.animateToMax.bind(this);
 		this.animateToInitial = this.animateToInitial.bind(this);
+		this.onStartShouldSetPanResponder = this.onStartShouldSetPanResponder.bind(this);
+		this.onMoveShouldSetPanResponder = this.onMoveShouldSetPanResponder.bind(this);
+		this.onPanResponderMove = this.onPanResponderMove.bind(this);
+		this.onPanResponderRelease = this.onPanResponderRelease.bind(this);
 
-		this._panResponder = PanResponder.create({
-			onStartShouldSetPanResponder: (evt, gestureState) => true,
-			onMoveShouldSetPanResponder: (evt, gestureState) => true,
-			onPanResponderTerminationRequest: (evt, gestureState) => true,
-
-			onPanResponderGrant: (evt, gestureState) => {
-				const { pageX } = evt.nativeEvent;
-				configs.grantX = pageX;
-			},
-
-			onPanResponderMove: (evt, gestureState) => {
-				const { pageX } = evt.nativeEvent;
-				const { isOpen, sidebarWidth, overlayMaxOpacity } = this.state;
-
-				if(isOpen) {
-					if(configs.grantX > pageX) {
-						configs.movingX = pageX;
-						
-						const calc = (overlayMaxOpacity*(configs.grantX - pageX))/sidebarWidth
-
-						this.setState({
-							sidebarPosition: new Animated.Value(pageX - configs.grantX),
-							overlayOpacity: new Animated.Value(overlayMaxOpacity - calc)
-						});
-					}
-				} else {
-					if(configs.grantX < configs.swipeWidthStart) {
-						configs.movingX = pageX;
-
-						const _size = pageX > sidebarWidth ? sidebarWidth : pageX;
-						const calc = (overlayMaxOpacity*_size)/sidebarWidth
-
-						this.setState({
-							overlayWidth: '100%',
-							sidebarPosition: new Animated.Value(_size + sidebarPositionCalc),
-							overlayOpacity: new Animated.Value(calc)
-						});
-					}
-				}
-			},
-
-			onPanResponderRelease: (evt, gestureState) => {
-				const { isOpen, sidebarWidth } = this.state;
-				const { pageX } = evt.nativeEvent;
-				const result = configs.grantX - pageX;
-
-				if(configs.movingX) {
-					if(isOpen) {
-						if(result > configs.swipeWidthToClose ) {
-							this.animateToInitial();
-						} else {
-							this.animateToMax();
-						}
-
-					} else {
-					
-						if( (result*-1) < configs.swipeWidthToClose ) {
-							this.animateToInitial();
-						} else {
-							this.animateToMax();
-						}
-					}
-
-					configs.movingX = null
-				} else {
-					// When click on Overlay view
-					if(configs.grantX > sidebarWidth && isOpen) {
-						this.animateToInitial();
-					}
-				}
-
-				configs.grantX = null;
-			}
+		this.responder = PanResponder.create({
+			onStartShouldSetPanResponder: this.onStartShouldSetPanResponder,
+			onMoveShouldSetPanResponder: this.onMoveShouldSetPanResponder,
+			onPanResponderMove: this.onPanResponderMove,
+			onPanResponderRelease: this.onPanResponderRelease
 		});
+	}
+
+	onStartShouldSetPanResponder(evt, gestureState) {
+		const { isOpen } = this.state;
+		const { pageX } = evt.nativeEvent;
+
+		configs.grantX = pageX;
+
+		if(isOpen)
+			return true;
+
+		return false;
+	}
+
+	onMoveShouldSetPanResponder(evt, gestureState) {
+		if(gestureState.moveX >= configs.swipeWidthStart)
+			return false
+
+		return true
+	}
+
+	onPanResponderMove(evt, gestureState) {
+		const { pageX } = evt.nativeEvent;
+		const { isOpen, sidebarWidth, overlayMaxOpacity } = this.state;
+
+
+		if(isOpen) {
+			if(configs.grantX > pageX) {
+				configs.movingX = pageX;
+				
+				const calc = (overlayMaxOpacity*(configs.grantX - pageX))/sidebarWidth
+
+				this.setState({
+					sidebarPosition: new Animated.Value(pageX - configs.grantX),
+					overlayOpacity: new Animated.Value(overlayMaxOpacity - calc)
+				});
+			}
+		} else {
+			if(configs.grantX < configs.swipeWidthStart) {
+				configs.movingX = pageX;
+
+				const _size = pageX > sidebarWidth ? sidebarWidth : pageX;
+				const calc = (overlayMaxOpacity*_size)/sidebarWidth
+
+				this.setState({
+					overlayWidth: '100%',
+					sidebarPosition: new Animated.Value(_size + sidebarPositionCalc),
+					overlayOpacity: new Animated.Value(calc)
+				});
+			}
+		}
+	}
+
+	onPanResponderRelease(evt, gestureState) {
+		const { isOpen, sidebarWidth } = this.state;
+		const { pageX } = evt.nativeEvent;
+		const result = pageX - configs.grantX;
+
+		console.log('RELEASE', result)
+
+		if(configs.movingX) {
+			if(isOpen) {
+				if((result*-1) > configs.swipeWidthToClose ) {
+					this.animateToInitial();
+				} else {
+					this.animateToMax();
+				}
+
+			} else {
+			
+				if( result < configs.swipeWidthToClose ) {
+					this.animateToInitial();
+				} else {
+					this.animateToMax();
+				}
+			}
+
+			configs.movingX = null
+		} else {
+			// When click on Overlay view
+			if(configs.grantX > sidebarWidth && isOpen) {
+				this.animateToInitial();
+			}
+		}
+
+		configs.grantX = null;
 	}
 
 	animate(_value, _toValue, _duration = this.state.animationDuration, _isFade) {
@@ -120,7 +142,7 @@ class Sidebar extends React.Component {
 	animateToMax() {
 		const { sidebarPosition, overlayOpacity, overlayMaxOpacity, animationDuration, overlayWidth } = this.state;
 
-		if(overlayWidth !== '100%')
+		if(overlayWidth !== '100%') {
 			this.setState({
 				overlayWidth: '100%'
 			})
@@ -167,7 +189,7 @@ class Sidebar extends React.Component {
 		const { children, menu } = this.props;
 
 		return(
-			<View style={styles.container} {...this._panResponder.panHandlers}>
+			<View style={styles.container} {...this.responder.panHandlers}>
 				<Animated.View style={[styles.sidebar, { width: sidebarWidth, left: sidebarPosition }]}>
 					{this.childrenWithProps(menu, { sidebarIsOpen: isOpen, closeSidebar: this.animateToInitial })}
 				</Animated.View>
