@@ -8,9 +8,7 @@ Testing how to build a sidebar menu with Swipe using PanResponder and Animated
 `npm install` 
 
 ## Running
-`npm start`  
-`npm run android` 
-`npm run ios` 
+`npm start` or `npm run android` or `npm run ios` 
 
 ## Usage
 ```javascript
