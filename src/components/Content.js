@@ -1,6 +1,6 @@
 import React from 'react';
 import PropTypes from 'prop-types';
-import { View, Text, Button, StyleSheet } from 'react-native';
+import { View, Text, TouchableOpacity, StyleSheet } from 'react-native';
 
 class Content extends React.Component {
     render() {
@@ -10,7 +10,10 @@ class Content extends React.Component {
             <View>
                 <View style={styles.header}>
                     <Text style={styles.headerText}>{`Sidebar is opened? ${sidebarIsOpen}`}</Text>
-                    <Button title='Open menu' onPress={openSidebar} />
+
+                    <TouchableOpacity style={styles.buttonStyle} onPress={openSidebar}>
+                        <Text style={styles.buttonText}>Open Menu</Text>
+                    </TouchableOpacity>
                 </View>
 
                 <View style={styles.content}>
@@ -59,10 +62,15 @@ const styles = StyleSheet.create({
         fontSize: 16,
         lineHeight: 22
     },
-    button: {
-        backgroundColor: '#DDD',
+    buttonStyle: {
         padding: 10,
-        alignItems: 'center'
+        alignItems: 'center',
+        backgroundColor: '#1194F6'
+    },
+    buttonText: {
+        fontSize: 20,
+        color: '#fff',
+        fontWeight: '600'
     }
 });
 
