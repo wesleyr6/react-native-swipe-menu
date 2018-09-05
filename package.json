@@ -11,7 +11,7 @@
   "license": "ISC",
   "main": "./node_modules/react-native-scripts/build/bin/crna-entry.js",
   "author": "Wesley Amaro <contato@wesleyamaro.com> (https://github.com/wesleyamaro)",
-  "homepage": "https://github.com/wesleyamaro/react-native-animation",
+  "homepage": "https://github.com/wesleyamaro/react-native-swipe-menu",
   "scripts": {
     "start": "react-native-scripts start",
     "eject": "react-native-scripts eject",
