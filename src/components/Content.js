@@ -31,7 +31,7 @@ class Content extends React.Component {
 }
 
 Content.propTypes = {
-    sidebarIsOpen: PropTypes.bool,
+    sidebarIsOpened: PropTypes.bool,
     openSidebar: PropTypes.func
 }
 

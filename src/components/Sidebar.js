@@ -183,12 +183,12 @@ class Sidebar extends React.Component {
 		return(
 			<View style={styles.container} {...this.responder.panHandlers}>
 				<Animated.View style={[styles.sidebar, { width: sidebarWidth, left: sidebarPosition }]}>
-					{this.childrenWithProps(menu, { sidebarIsOpen: isOpen, closeSidebar: this.animateToInitial })}
+					{this.childrenWithProps(menu, { sidebarIsOpened: isOpen, closeSidebar: this.animateToInitial })}
 				</Animated.View>
 
 				<Animated.View style={[styles.overlay, {width: overlayWidth, opacity: overlayOpacity}]} />
 
-				{this.childrenWithProps(children, { sidebarIsOpen: isOpen, openSidebar: this.animateToMax })}
+				{this.childrenWithProps(children, { sidebarIsOpened: isOpen, openSidebar: this.animateToMax })}
 			</View>
 		)
 	}

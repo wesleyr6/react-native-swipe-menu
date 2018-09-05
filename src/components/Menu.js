@@ -90,7 +90,7 @@ const Menu = ({ closeSidebar }) => {
 
 Menu.propTypes = {
     closeSidebar: PropTypes.func,
-    sidebarIsOpen: PropTypes.bool
+    sidebarIsOpened: PropTypes.bool
 }
 
 const styles = StyleSheet.create({
