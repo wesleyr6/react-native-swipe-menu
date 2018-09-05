@@ -4,12 +4,12 @@ import { View, Text, TouchableOpacity, StyleSheet } from 'react-native';
 
 class Content extends React.Component {
     render() {
-        const { sidebarIsOpen, openSidebar } = this.props;
+        const { sidebarIsOpened, openSidebar } = this.props;
 
         return(
             <View>
                 <View style={styles.header}>
-                    <Text style={styles.headerText}>{`Sidebar is opened? ${sidebarIsOpen}`}</Text>
+                    <Text style={styles.headerText}>{`Sidebar is opened? ${sidebarIsOpened}`}</Text>
 
                     <TouchableOpacity style={styles.buttonStyle} onPress={openSidebar}>
                         <Text style={styles.buttonText}>Open Menu</Text>
