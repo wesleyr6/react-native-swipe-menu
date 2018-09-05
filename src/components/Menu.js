@@ -4,7 +4,7 @@ import { Button } from 'react-native';
  
 const Menu = ({ closeSidebar }) => {
     return(
-        <Button title="click to close it" onPress={() => closeSidebar()} />
+        <Button title="click to close it" onPress={closeSidebar} />
     )
 }
 
