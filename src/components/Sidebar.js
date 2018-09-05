@@ -1,15 +1,22 @@
 import React from 'react';
 import PropTypes from 'prop-types';
-import { View, PanResponder, Dimensions, StyleSheet, Animated, Easing, Button } from 'react-native';
-
-// It will open 83% of the total screen size
-const sidebarPositionCalc = (((Dimensions.get('window').width*84)/100)*-1);
+import { 
+	View, 
+	PanResponder, 
+	Dimensions, 
+	StyleSheet, 
+	Animated, 
+	Easing 
+} from 'react-native';
 
 let configs = {
 	grantX: null, // Position X of the view when the user exec click command
 	movingX: null, // Position X of the view when the user starts to moving
 	swipeWidthStart: 40, // Width of the view which user can starts swipe
-	swipeWidthToClose: 70 // Width of the view which user needs to move to close swipe
+	swipeWidthToClose: 70, // Width of the view which user needs to move to close swipe
+	sidebarMaxWidth: ((Dimensions.get('window').width*84)/100), // It will open 84% of the total screen size
+	animationDuration: 400, // miliseconds
+	overlayMaxOpacity: 0.7 // Opacity Level when the overlay view is opened
 }
 
 class Sidebar extends React.Component {
@@ -18,12 +25,10 @@ class Sidebar extends React.Component {
 
 		this.state = {
 			isOpen: false,
-			sidebarWidth: sidebarPositionCalc*-1, 
-			sidebarPosition: new Animated.Value(sidebarPositionCalc),
+			sidebarWidth: configs.sidebarMaxWidth, 
+			sidebarPosition: new Animated.Value(configs.sidebarMaxWidth*-1),
 			overlayWidth: 0,
-			overlayOpacity: new Animated.Value(0),
-			overlayMaxOpacity: 0.7, // Opacity Level when the overlay view is opened
-			animationDuration: 400 // miliseconds
+			overlayOpacity: new Animated.Value(0)
 		};
 
 		this.animateToMax = this.animateToMax.bind(this);
@@ -62,18 +67,17 @@ class Sidebar extends React.Component {
 
 	onPanResponderMove(evt, gestureState) {
 		const { pageX } = evt.nativeEvent;
-		const { isOpen, sidebarWidth, overlayMaxOpacity } = this.state;
-
+		const { isOpen, sidebarWidth } = this.state;
 
 		if(isOpen) {
 			if(configs.grantX > pageX) {
 				configs.movingX = pageX;
 				
-				const calc = (overlayMaxOpacity*(configs.grantX - pageX))/sidebarWidth
+				const calc = (configs.overlayMaxOpacity*(configs.grantX - pageX))/sidebarWidth
 
 				this.setState({
 					sidebarPosition: new Animated.Value(pageX - configs.grantX),
-					overlayOpacity: new Animated.Value(overlayMaxOpacity - calc)
+					overlayOpacity: new Animated.Value(configs.overlayMaxOpacity - calc)
 				});
 			}
 		} else {
@@ -81,11 +85,11 @@ class Sidebar extends React.Component {
 				configs.movingX = pageX;
 
 				const _size = pageX > sidebarWidth ? sidebarWidth : pageX;
-				const calc = (overlayMaxOpacity*_size)/sidebarWidth
+				const calc = (configs.overlayMaxOpacity*_size)/sidebarWidth
 
 				this.setState({
 					overlayWidth: '100%',
-					sidebarPosition: new Animated.Value(_size + sidebarPositionCalc),
+					sidebarPosition: new Animated.Value(_size + configs.sidebarMaxWidth*-1),
 					overlayOpacity: new Animated.Value(calc)
 				});
 			}
@@ -98,20 +102,12 @@ class Sidebar extends React.Component {
 		const result = pageX - configs.grantX;
 
 		if(configs.movingX) {
-			if(isOpen) {
-				if((result*-1) > configs.swipeWidthToClose ) {
-					this.animateToInitial();
-				} else {
-					this.animateToMax();
-				}
+			const conditional = isOpen ? (result*-1) > configs.swipeWidthToClose : result < configs.swipeWidthToClose;
 
+			if(conditional ) {
+				this.animateToInitial();
 			} else {
-			
-				if( result < configs.swipeWidthToClose ) {
-					this.animateToInitial();
-				} else {
-					this.animateToMax();
-				}
+				this.animateToMax();
 			}
 
 			configs.movingX = null
@@ -125,7 +121,7 @@ class Sidebar extends React.Component {
 		configs.grantX = null;
 	}
 
-	animate(_value, _toValue, _duration = this.state.animationDuration, _isFade) {
+	animate(_value, _toValue, _duration = configs.animationDuration, _isFade) {
 		let configs = {
 			toValue: _toValue,
 			duration: _duration
@@ -138,12 +134,10 @@ class Sidebar extends React.Component {
 	}
 
 	animateToMax() {
-		const { sidebarPosition, overlayOpacity, overlayMaxOpacity, animationDuration, overlayWidth } = this.state;
+		const { sidebarPosition, overlayOpacity, overlayWidth } = this.state;
 
 		if(overlayWidth !== '100%')
-			this.setState({
-				overlayWidth: '100%'
-			})
+			this.setState({ overlayWidth: '100%' })
 
 		this.animate(sidebarPosition, 0).start(() => {
 			this.setState({
@@ -152,25 +146,25 @@ class Sidebar extends React.Component {
 			});
 		});
 		
-		this.animate(overlayOpacity, overlayMaxOpacity, animationDuration, true).start(() => {
+		this.animate(overlayOpacity, configs.overlayMaxOpacity, configs.animationDuration, true).start(() => {
 			this.setState({
-				overlayOpacity: new Animated.Value(overlayMaxOpacity)
+				overlayOpacity: new Animated.Value(configs.overlayMaxOpacity)
 			})
 		});
 	}
 
 	animateToInitial() {
-		const { overlayOpacity, sidebarPosition, animationDuration } = this.state;
+		const { overlayOpacity, sidebarPosition } = this.state;
 
-		this.animate(sidebarPosition, sidebarPositionCalc).start(() => {
+		this.animate(sidebarPosition, configs.sidebarMaxWidth*-1).start(() => {
 			this.setState({
 				isOpen: false,
 				overlayWidth: 0,
-				sidebarPosition: new Animated.Value(sidebarPositionCalc)
+				sidebarPosition: new Animated.Value(configs.sidebarMaxWidth*-1)
 			});
 		});
 
-		this.animate(overlayOpacity, 0, animationDuration, true).start(() => {
+		this.animate(overlayOpacity, 0, configs.animationDuration, true).start(() => {
 			this.setState({
 				overlayOpacity: new Animated.Value(0)
 			})
@@ -213,17 +207,13 @@ const styles = StyleSheet.create({
 		backgroundColor: '#fff',
 		flexDirection: 'row'
 	},
-	buttonStyle: {
-		width: '100%'
-	},
 	sidebar: {
 		height: '100%',
 		position: 'absolute',
 		left: 0,
 		top: 0,
 		zIndex: 999,
-		backgroundColor: '#1e1d29',
-		flexWrap: 'wrap'
+		backgroundColor: '#1e1d29'
 	},
 	overlay: {
 		height: '100%',
