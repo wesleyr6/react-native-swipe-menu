@@ -181,7 +181,7 @@ class Sidebar extends React.Component {
 
 		return(
 			<View style={styles.container} {...this.responder.panHandlers}>
-				<Animated.View style={[styles.sidebar, { left: sidebarPosition }]}>
+				<Animated.View style={[styles.sidebar, { transform: [{ translateX: sidebarPosition }]  }]}>
 					{this.childrenWithProps(menu, { sidebarIsOpened: isOpen, closeSidebar: this.animateToInitial })}
 				</Animated.View>
 
