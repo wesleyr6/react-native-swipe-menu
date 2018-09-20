@@ -13,7 +13,7 @@ let configs = {
 	movingX: null, // Position X of the view when the user starts to moving
 	swipeWidthStart: 40, // Width of the view which user can starts swipe
 	swipeWidthToClose: 70, // Width of the view which user needs to move to close swipe
-	sidebarMaxWidth: ((Dimensions.get('window').width*84)/100), // It will open 84% of the total screen size
+	sidebarWidth: ((Dimensions.get('window').width*84)/100), // It will open 84% of the total screen size
 	animationDuration: 400, // miliseconds
 	overlayMaxOpacity: 0.7, // Opacity Level when the overlay view is opened
 	tolerance: 10
@@ -24,9 +24,8 @@ class Sidebar extends React.Component {
 		super(props);
 
 		this.state = {
-			isOpen: false,
-			sidebarWidth: configs.sidebarMaxWidth, 
-			sidebarPosition: new Animated.Value(configs.sidebarMaxWidth*-1),
+			isOpen: false, 
+			sidebarPosition: new Animated.Value(configs.sidebarWidth*-1),
 			overlayWidth: 0,
 			overlayOpacity: new Animated.Value(0)
 		};
@@ -69,13 +68,13 @@ class Sidebar extends React.Component {
 
 	onPanResponderMove(evt, gestureState) {
 		const { pageX } = evt.nativeEvent;
-		const { isOpen, sidebarWidth } = this.state;
+		const { isOpen } = this.state;
 
 		if(isOpen) {
 			if(gestureState.x0 > pageX) {
 				configs.movingX = pageX;
 				
-				const calc = (configs.overlayMaxOpacity*(gestureState.x0 - pageX))/sidebarWidth
+				const calc = (configs.overlayMaxOpacity*(gestureState.x0 - pageX))/configs.sidebarWidth
 
 				this.setState({
 					sidebarPosition: new Animated.Value(pageX - gestureState.x0),
@@ -86,12 +85,12 @@ class Sidebar extends React.Component {
 			if(gestureState.x0 < configs.swipeWidthStart) {
 				configs.movingX = pageX;
 
-				const _size = pageX > sidebarWidth ? sidebarWidth : pageX;
-				const calc = (configs.overlayMaxOpacity*_size)/sidebarWidth
+				const _size = pageX > configs.sidebarWidth ? configs.sidebarWidth : pageX;
+				const calc = (configs.overlayMaxOpacity*_size)/configs.sidebarWidth
 
 				this.setState({
 					overlayWidth: '100%',
-					sidebarPosition: new Animated.Value(_size + configs.sidebarMaxWidth*-1),
+					sidebarPosition: new Animated.Value(_size + configs.sidebarWidth*-1),
 					overlayOpacity: new Animated.Value(calc)
 				});
 			}
@@ -99,7 +98,7 @@ class Sidebar extends React.Component {
 	}
 
 	onPanResponderRelease(evt, gestureState) {
-		const { isOpen, sidebarWidth } = this.state;
+		const { isOpen } = this.state;
 		const { pageX } = evt.nativeEvent;
 		const result = pageX - gestureState.x0;
 
@@ -115,7 +114,7 @@ class Sidebar extends React.Component {
 			configs.movingX = null
 		} else {
 			// When click on Overlay view
-			if(gestureState.x0 > sidebarWidth && isOpen) {
+			if(gestureState.x0 > configs.sidebarWidth && isOpen) {
 				this.animateToInitial();
 			}
 		}
@@ -156,11 +155,11 @@ class Sidebar extends React.Component {
 	animateToInitial() {
 		const { overlayOpacity, sidebarPosition } = this.state;
 
-		this.animate(sidebarPosition, configs.sidebarMaxWidth*-1).start(() => {
+		this.animate(sidebarPosition, configs.sidebarWidth*-1).start(() => {
 			this.setState({
 				isOpen: false,
 				overlayWidth: 0,
-				sidebarPosition: new Animated.Value(configs.sidebarMaxWidth*-1)
+				sidebarPosition: new Animated.Value(configs.sidebarWidth*-1)
 			});
 		});
 
@@ -177,12 +176,12 @@ class Sidebar extends React.Component {
 	}
 
 	render() {
-		const { sidebarWidth, overlayWidth, overlayOpacity, sidebarPosition, isOpen } = this.state;
+		const { overlayWidth, overlayOpacity, sidebarPosition, isOpen } = this.state;
 		const { children, menu } = this.props;
 
 		return(
 			<View style={styles.container} {...this.responder.panHandlers}>
-				<Animated.View style={[styles.sidebar, { width: sidebarWidth, left: sidebarPosition }]}>
+				<Animated.View style={[styles.sidebar, { left: sidebarPosition }]}>
 					{this.childrenWithProps(menu, { sidebarIsOpened: isOpen, closeSidebar: this.animateToInitial })}
 				</Animated.View>
 
@@ -210,10 +209,10 @@ const styles = StyleSheet.create({
 	sidebar: {
 		height: '100%',
 		position: 'absolute',
-		left: 0,
 		top: 0,
 		zIndex: 999,
-		backgroundColor: '#1e1d29'
+		backgroundColor: '#1e1d29',
+		width: configs.sidebarWidth
 	},
 	overlay: {
 		height: '100%',
