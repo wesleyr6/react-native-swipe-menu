@@ -27,6 +27,7 @@ class Sidebar extends React.Component {
 			isOpen: false, 
 			sidebarPosition: new Animated.Value(configs.sidebarWidth*-1),
 			overlayWidth: 0,
+			containerWidth: configs.tolerance,
 			overlayOpacity: new Animated.Value(0)
 		};
 
@@ -43,6 +44,14 @@ class Sidebar extends React.Component {
 			onPanResponderMove: this.onPanResponderMove,
 			onPanResponderRelease: this.onPanResponderRelease
 		});
+	}
+
+	componentDidMount() {
+		this.props.onRef(this)
+	}
+
+	componentWillUnmount() {
+		this.props.onRef(undefined)
 	}
 
 	onStartShouldSetPanResponder(evt, gestureState) {
@@ -90,6 +99,7 @@ class Sidebar extends React.Component {
 
 				this.setState({
 					overlayWidth: '100%',
+					containerWidth: '100%',
 					sidebarPosition: new Animated.Value(_size + configs.sidebarWidth*-1),
 					overlayOpacity: new Animated.Value(calc)
 				});
@@ -135,6 +145,8 @@ class Sidebar extends React.Component {
 	animateToMax() {
 		const { sidebarPosition, overlayOpacity, overlayWidth } = this.state;
 
+		this.setState({ containerWidth: '100%' });
+
 		if(overlayWidth !== '100%')
 			this.setState({ overlayWidth: '100%' })
 
@@ -159,6 +171,7 @@ class Sidebar extends React.Component {
 			this.setState({
 				isOpen: false,
 				overlayWidth: 0,
+				containerWidth: configs.tolerance,
 				sidebarPosition: new Animated.Value(configs.sidebarWidth*-1)
 			});
 		});
@@ -176,18 +189,16 @@ class Sidebar extends React.Component {
 	}
 
 	render() {
-		const { overlayWidth, overlayOpacity, sidebarPosition, isOpen } = this.state;
-		const { children, menu } = this.props;
+		const { overlayWidth, overlayOpacity, sidebarPosition, isOpen, containerWidth } = this.state;
+		const { menu } = this.props;
 
 		return(
-			<View style={styles.container} {...this.responder.panHandlers}>
+			<View style={[styles.container, { width: containerWidth}]} {...this.responder.panHandlers}>
 				<Animated.View style={[styles.sidebar, { transform: [{ translateX: sidebarPosition }]  }]}>
 					{this.childrenWithProps(menu, { sidebarIsOpened: isOpen, closeSidebar: this.animateToInitial })}
 				</Animated.View>
 
 				<Animated.View style={[styles.overlay, {width: overlayWidth, opacity: overlayOpacity}]} />
-
-				{this.childrenWithProps(children, { sidebarIsOpened: isOpen, openSidebar: this.animateToMax })}
 			</View>
 		)
 	}
@@ -200,10 +211,12 @@ Sidebar.propType = {
 
 const styles = StyleSheet.create({
 	container: {
-		width: '100%',
 		height: '100%',
-		position: 'relative',
-		backgroundColor: '#fff',
+		position: 'absolute',
+		top: 0,
+		left: 0,
+		zIndex: 9999,
+		backgroundColor: 'transparent',
 		flexDirection: 'row'
 	},
 	sidebar: {

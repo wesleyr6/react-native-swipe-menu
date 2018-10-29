@@ -7,7 +7,7 @@ class Content extends React.Component {
         const { sidebarIsOpened, openSidebar } = this.props;
 
         return(
-            <View>
+            <View style={styles.container}>
                 <View style={styles.header}>
                     <Text style={styles.headerText}>{`Sidebar is opened? ${sidebarIsOpened}`}</Text>
 
@@ -37,7 +37,10 @@ Content.propTypes = {
 
 const styles = StyleSheet.create({
     container: {
-        backgroundColor: '#E9EAED'
+        backgroundColor: '#E9EAED',
+        width: '100%',
+        position: 'relative',
+        zIndex: 1
     },
     header: {
         padding: 12,

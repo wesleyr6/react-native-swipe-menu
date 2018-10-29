@@ -10,9 +10,8 @@ const App = () => {
 		<View>
 			<StatusBar bg={'#313131'} />
 			
-			<Sidebar menu={<Menu />}>
-				<Content />
-			</Sidebar>
+			<Content openSidebar={() => this.sidebar.animateToMax()} />
+			<Sidebar menu={<Menu />} onRef={ref => this.sidebar = ref} />
 		</View>
 	);
 }
